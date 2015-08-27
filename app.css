@@ -1,3 +1,15 @@
 .app {
      /* Add app styles here */
 }
+
+.ico-test-valustream 
+{ 
+    width:15px; height:15px; 
+    background-image:url('https://cdn0.iconfinder.com/data/icons/frankfurt/16/featured.png') !important; 
+}
+
+.ico-test-milestone 
+{ 
+    width:15px; height:15px; 
+    background-image:url('https://cdn2.iconfinder.com/data/icons/blue-bits-basic-and-bonus/16/057.png') !important; 
+}
