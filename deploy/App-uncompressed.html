@@ -78,7 +78,7 @@
                     var selectedProjRef = '/project/' + selectedProj.ObjectID;
                         
                     //registering the selected project reference.
-                    this.requiredProjectsList.push(selectedProjRef);
+                    this.requiredProjectsList.push(selectedProj.ObjectID);
                         
                     //identifying whether selected project has any children.
                     var selectedProjChildren = selectedProj.Children;
@@ -86,8 +86,6 @@
                         this._loadAllChildProjectsFromParent(selectedProjRef);
                     }
                     
-                    console.log('Project coll length: ', this.requiredProjectsList.length);
-                        
                     //creating the milestone Store Filter.
                     this._createMilestoneStoreFilter();
                              
@@ -103,11 +101,10 @@
     
     _loadAllChildProjectsFromParent: function(parentProjRef){
         var that = this;
-        
         Ext.Array.each(this.allProjectsColl, function(thisProject) {
             //identifying current project is child of the Project with reference..
             if(thisProject.get('Parent') && thisProject.get('Parent')._ref !== null && thisProject.get('Parent')._ref == parentProjRef){
-                that.requiredProjectsList.push(thisProject.get('_ref'));
+                that.requiredProjectsList.push(thisProject.data.ObjectID);
                 
                 //identifying whether the project as any further children.
                 var projChildren = thisProject.get('Children');
@@ -119,19 +116,12 @@
     },
     
     _createMilestoneStoreFilter: function(){
-         this.projectMilestoneFilter = Ext.create('Rally.data.wsapi.Filter', {
-                            property: 'TargetProject',
-                            operator: '=',
-                            value : this.requiredProjectsList[0]
-                        });
-
-        for(i=1; i<this.requiredProjectsList.length; i++){
-            this.projectMilestoneFilter = this.projectMilestoneFilter.or(Ext.create('Rally.data.wsapi.Filter', {
-                                    property: 'TargetProject',
-                                    operator: '=',
-                                    value : this.requiredProjectsList[i]
-                                }));
-        }
+        
+       this.projectMilestoneFilter =  Ext.create('Rally.data.wsapi.Filter', {
+                                    property: 'TargetDate',
+                                    operator: '>=',
+                                    value: 'today'
+                                });
         
         //only include milestones shared for all projects if the setting is enabled
         if (this.getSetting('includeGlobalMilestones')) {        
@@ -142,11 +132,6 @@
             }));
         }
         
-        this.projectMilestoneFilter = this.projectMilestoneFilter.and(Ext.create('Rally.data.wsapi.Filter', {
-                                    property: 'TargetDate',
-                                    operator: '>=',
-                                    value: 'today'
-                                }));
         
         //only apply filtering on the notes field if configured
         if (this.getSetting('notesFilter')) {
@@ -172,21 +157,17 @@
     _createMilestoneStore: function() {
         var that = this;
         
-        Ext.create('Rally.data.wsapi.TreeStoreBuilder').build({
-            models: ['milestone'],
+        var myStore = Ext.create("Rally.data.wsapi.Store", {
+            model: 'milestone',
             autoLoad: true,
-            enableHierarchy: false,
             compact: false,
-            filters: this.projectMilestoneFilter,
-            //TODO: allow grouping by fields or Category (which is temporarily stored in Notes)
-            groupField: that._getGroupByField(),
-            //Prepare the string to be grouped by
-            getGroupString: function(record) {
-                
-                if (that.getSetting('groupByValueStream')) {
-                    return that._getValueStreamFromRecord(record);
-                }
+            listeners: {
+                load: function(store, data, success) {
+                    this._filterMileStones(data);
+                },
+                scope: this
             },
+            filters : this.projectMilestoneFilter,
             sorters: [
                 {
                     property: 'TargetProject',
@@ -197,10 +178,20 @@
                     direction: 'ASC'
                 }
             ]
-        }).then({
-            success: this._onStoreBuilt,
-            scope: this
-        });   
+        });
+        
+    },
+    
+    _filterMileStones: function(myData) {
+        var that = this;
+        //Filter out milestone will be stored here
+        var filteredMilestonesArr = [];
+        Ext.each(myData, function(data, index) {
+          if(data.data.TargetProject !== null && data.data.TargetProject !== "" && (that.requiredProjectsList.indexOf(data.data.TargetProject.ObjectID) > -1)){
+              filteredMilestonesArr.push(data);
+          }
+        });
+        console.log("Filtered Milestone length : " + filteredMilestonesArr.length);
     },
     
     _onStoreBuilt: function(store) {
