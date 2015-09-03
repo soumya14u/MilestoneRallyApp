@@ -10,7 +10,8 @@ Ext.define('MilestoneTreeModel', {
                 {name: 'Visibility', mapping: 'Visibility', type: types.STRING},
                 {name: 'Status', mapping: 'Status', type: types.STRING},
                 {name: 'DisplayColor', mapping: 'DisplayColor', type: types.STRING},
-                {name: 'Notes', mapping: 'Notes', type: types.STRING}
+                {name: 'Notes', mapping: 'Notes', type: types.STRING},
+                {name: '_ref', mapping: '_ref', type: types.STRING}
             ],
     hasMany: {model: 'FeatureTreeModel', name:'features', associationKey: 'features'}
 });
@@ -276,34 +277,46 @@ Ext.define('CustomApp', {
        var valuestreamMilestoneTreePanel = Ext.create('Ext.tree.Panel', {
             store: milestoneValueStreamTreeStore,
             useArrows: true,
-            lines: true,
+            rowLines: true,
             displayField: 'Name',
             rootVisible: false,
             width: '100%',
             height: 'auto', // Extra scroll for individual sections:
-            plugins: ['cellediting', 'gridviewdragdrop'],
+            viewConfig: {
+                getRowClass: function(record, index) {
+                    var nameRecord = Ext.String.format("{0}", record.get('Name'));
+                    if(nameRecord && nameRecord.search('valuestream:') === -1){
+                        return 'row-child';
+                    }
+                    return 'row-parent';
+                }
+            },
             columns: [{
                           xtype: 'treecolumn',
                           text: 'Name',
                           dataIndex: 'Name',
                           resizeable: true,
-                          width: 300,
+                          width : 300,
                           renderer: function(value,style,item,rowIndex) {
                                 var link = Ext.String.format("{0}", value);
-                                if(link.search('valuestream:') === -1)
-                                    link = Ext.String.format("<a target='_top' href='{1}'>{0}</a>", value, Rally.nav.Manager.getDetailUrl(item));
+                                if(link.search('valuestream:') === -1){
+                                    var ref = item.get('_ref');
+                                    link = Ext.String.format("<a target='_top' href='{1}'><b>{0}</b></a>", value, Rally.nav.Manager.getDetailUrl(ref));
+                                }
+                                else
+                                    link= Ext.String.format("<b>{0}</b>", value);
                                 return link;
                             }
                     },
                     {
                         text: 'Project', 
                         dataIndex: 'TargetProject',
-                        width: 300
+                        width : 200
                     },
                     {
                         text: 'Target Date', 
                         dataIndex: 'TargetDate',
-                        width: 100,
+                        width : 100,
                         renderer: function(value){
                             if(value)
                                 return Rally.util.DateTime.format(value, 'M Y');
@@ -312,12 +325,18 @@ Ext.define('CustomApp', {
                     {
                         text: 'Color',
                         dataIndex: 'DisplayColor',
-                        width: 100
+                        width : 100,
+                        renderer: function(value){
+                            if(value){ 
+                                var colorHtml = Ext.String.format("<div class= 'color-box' style= 'background-color: {0};'></div>", value);
+                                return colorHtml;
+                            }
+                        }
                     },
                     {
                         text: 'Notes',
                         dataIndex: 'Notes',
-                        width: 500
+                        width : 700
                     }
                 ]
         });
@@ -346,7 +365,7 @@ Ext.define('CustomApp', {
                     leaf: false,
                     expandable: true,
                     expanded: false,
-                    iconCls: '.ico-test-valustream'
+                    iconCls: 'ico-test-valustream'
                 });
                 
         return  valustreamTreeNode;
@@ -362,10 +381,11 @@ Ext.define('CustomApp', {
             TargetProject: targetProjectName,
             DisplayColor: milestoneData.get('DisplayColor'),
             Notes: milestoneData.get('Notes'),
+            _ref: milestoneData.get('_ref'),
             leaf: true,
             expandable: false,
             expanded: false,
-            iconCls: '.ico-test-milestone'
+            iconCls: 'ico-test-milestone'
         });
         
         return milestoneTreeNode;

@@ -4,12 +4,41 @@
 
 .ico-test-valustream 
 { 
-    width:15px; height:15px; 
-    background-image:url('https://cdn0.iconfinder.com/data/icons/frankfurt/16/featured.png') !important; 
+    width:20px; height:20px; top: 8px;
+    background-image:url('https://cdn4.iconfinder.com/data/icons/stash/128/ruby-16.png') !important; 
 }
 
 .ico-test-milestone 
 { 
-    width:15px; height:15px; 
-    background-image:url('https://cdn2.iconfinder.com/data/icons/blue-bits-basic-and-bonus/16/057.png') !important; 
+    width:20px; height:20px; top: 8px;
+    background-image:url('https://cdn1.iconfinder.com/data/icons/all_google_icons_symbols_by_carlosjj-du/16/milestone.png') !important; 
+}
+
+.color-box {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    background-color: #ccc;
+    position: relative;
+    left: 10px;
+    top: 0px;
+}
+
+.row-parent .x-grid-cell {
+    background-color: #77D38D !important;
+}
+.x-grid-item-over .row-parent  .x-grid-cell {
+    background-color: #3da5f5 !important;
+}
+.x-grid-item-selected .row-parent .x-grid-cell {
+    background-color: #ff0 !important;
+}
+.row-child .x-grid-cell {
+    background-color: #CFFDDA !important;
+}
+.x-grid-item-over .row-child .x-grid-cell {
+    background-color: #C2FABA !important;
+}
+.x-grid-item-selected .row-child .x-grid-cell {
+    background-color: #80AA79 !important;
 }
