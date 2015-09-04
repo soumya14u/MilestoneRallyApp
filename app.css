@@ -24,6 +24,11 @@
     top: 0px;
 }
 
+.no-icon {
+	display : none;
+	background-image:url('ext/resources/images/default/s.gif') !important;
+}
+
 .row-parent .x-grid-cell {
     background-color: #77D38D !important;
 }
@@ -34,7 +39,7 @@
     background-color: #ff0 !important;
 }
 .row-child .x-grid-cell {
-    background-color: #CFFDDA !important;
+    background-color: #FFFFFF !important;
 }
 .x-grid-item-over .row-child .x-grid-cell {
     background-color: #C2FABA !important;

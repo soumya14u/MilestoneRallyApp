@@ -37,13 +37,13 @@ Ext.define('CustomApp', {
                 xtype: 'rallycheckboxfield',
                 fieldLabel: '',
                 boxLabel: 'Include global milestones'
-            },
-            {
-                name: 'groupByValueStream',
-                xtype: 'rallycheckboxfield',
-                fieldLabel: '',
-                boxLabel: 'Group by Value Stream'
             }
+            // {
+            //     name: 'groupByValueStream',
+            //     xtype: 'rallycheckboxfield',
+            //     fieldLabel: '',
+            //     boxLabel: 'Group by Value Stream'
+            // }
         ];
     },
     
@@ -296,27 +296,35 @@ Ext.define('CustomApp', {
                           text: 'Name',
                           dataIndex: 'Name',
                           resizeable: true,
-                          width : 300,
+                          flex: 3,
+                          minWidth:200,
+                          //width : 300,
                           renderer: function(value,style,item,rowIndex) {
                                 var link = Ext.String.format("{0}", value);
                                 if(link.search('valuestream:') === -1){
                                     var ref = item.get('_ref');
                                     link = Ext.String.format("<a target='_top' href='{1}'><b>{0}</b></a>", value, Rally.nav.Manager.getDetailUrl(ref));
                                 }
-                                else
-                                    link= Ext.String.format("<b>{0}</b>", value);
+                                else{
+                                    var onlyName = link.replace('valuestream:', '');
+                                    link= Ext.String.format("<b>{0}</b>", onlyName);
+                                }
+                                    
                                 return link;
                             }
                     },
                     {
                         text: 'Project', 
                         dataIndex: 'TargetProject',
-                        width : 200
+                        flex: 2,
+                        //width : 200,
+                        hidden: true
                     },
                     {
                         text: 'Target Date', 
                         dataIndex: 'TargetDate',
-                        width : 100,
+                        flex: 1,
+                        //width : 100,
                         renderer: function(value){
                             if(value)
                                 return Rally.util.DateTime.format(value, 'M Y');
@@ -325,7 +333,8 @@ Ext.define('CustomApp', {
                     {
                         text: 'Color',
                         dataIndex: 'DisplayColor',
-                        width : 100,
+                        flex: 1,
+                        //width : 100,
                         renderer: function(value){
                             if(value){ 
                                 var colorHtml = Ext.String.format("<div class= 'color-box' style= 'background-color: {0};'></div>", value);
@@ -336,7 +345,8 @@ Ext.define('CustomApp', {
                     {
                         text: 'Notes',
                         dataIndex: 'Notes',
-                        width : 700
+                        flex: 5
+                        //width : 700
                     }
                 ]
         });
@@ -364,8 +374,8 @@ Ext.define('CustomApp', {
                     Name: valueStreamLable,
                     leaf: false,
                     expandable: true,
-                    expanded: false,
-                    iconCls: 'ico-test-valustream'
+                    expanded: true,
+                    iconCls :'no-icon'
                 });
                 
         return  valustreamTreeNode;
@@ -385,7 +395,7 @@ Ext.define('CustomApp', {
             leaf: true,
             expandable: false,
             expanded: false,
-            iconCls: 'ico-test-milestone'
+            iconCls :'no-icon'
         });
         
         return milestoneTreeNode;
